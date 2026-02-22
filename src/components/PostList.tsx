@@ -1,6 +1,6 @@
 import React from 'react';
 import { IftarPost } from '../types';
-import { ThumbsUp, ThumbsDown, CheckCircle, AlertTriangle, MapPin, Clock, User } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, CheckCircle, AlertTriangle, MapPin, Clock, User, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 
@@ -62,6 +62,22 @@ export const PostList: React.FC<PostListProps> = ({ posts, user }) => {
     }
   };
 
+  const handleDelete = async (postId: string) => {
+    if (!window.confirm('আপনি কি নিশ্চিত যে আপনি এই পোস্টটি ডিলিট করতে চান?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId);
+
+      if (error) throw error;
+      toast.success('পোস্টটি সফলভাবে ডিলিট করা হয়েছে');
+    } catch (error: any) {
+      toast.error('ডিলিট করতে সমস্যা হয়েছে: ' + error.message);
+    }
+  };
+
   if (posts.length === 0) {
     return (
       <div className="text-center py-12 bg-white rounded-xl shadow-inner border-2 border-dashed border-gray-200">
@@ -81,6 +97,7 @@ export const PostList: React.FC<PostListProps> = ({ posts, user }) => {
         {posts.map((post) => {
           const isVerified = post.true_votes >= 10;
           const isReported = post.false_votes >= 5;
+          const isOwner = user && post.owner_email === user.email;
 
           return (
             <div 
@@ -106,17 +123,28 @@ export const PostList: React.FC<PostListProps> = ({ posts, user }) => {
                     {post.location_name}
                   </h3>
                   <div className="flex flex-col gap-1 items-end">
-                    {isVerified && (
-                      <span className="flex items-center gap-1 text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold uppercase tracking-wider">
-                        <CheckCircle className="w-3 h-3" />
-                        ভেরিফাইড
-                      </span>
-                    )}
-                    {isReported && (
-                      <span className="flex items-center gap-1 text-[10px] bg-red-100 text-red-700 px-2 py-1 rounded-full font-bold uppercase tracking-wider">
-                        <AlertTriangle className="w-3 h-3" />
-                        রিপোর্টেড
-                      </span>
+                    <div className="flex gap-2">
+                      {isVerified && (
+                        <span className="flex items-center gap-1 text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold uppercase tracking-wider">
+                          <CheckCircle className="w-3 h-3" />
+                          ভেরিফাইড
+                        </span>
+                      )}
+                      {isReported && (
+                        <span className="flex items-center gap-1 text-[10px] bg-red-100 text-red-700 px-2 py-1 rounded-full font-bold uppercase tracking-wider">
+                          <AlertTriangle className="w-3 h-3" />
+                          রিপোর্টেড
+                        </span>
+                      )}
+                    </div>
+                    {isOwner && (
+                      <button 
+                        onClick={() => handleDelete(post.id!)}
+                        className="text-red-500 hover:text-red-700 p-1 transition-colors"
+                        title="Delete Post"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     )}
                   </div>
                 </div>

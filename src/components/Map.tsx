@@ -15,7 +15,7 @@ export const Map: React.FC<MapProps> = ({ posts, onMarkerClick, onMapClick, cent
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [MarkerClass, setMarkerClass] = useState<typeof google.maps.Marker | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const markersRef = useRef<google.maps.Marker[]>([]);
+  const markersMapRef = useRef<Map<string, google.maps.Marker>>(new Map());
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const symbolPathRef = useRef<any>(null);
   const isInitializing = useRef(false);
@@ -29,6 +29,7 @@ export const Map: React.FC<MapProps> = ({ posts, onMarkerClick, onMapClick, cent
     (setOptions as any)({
       apiKey: apiKey,
       version: 'weekly',
+      language: 'bn', // Set map language to Bengali
     });
 
     Promise.all([
@@ -41,6 +42,9 @@ export const Map: React.FC<MapProps> = ({ posts, onMarkerClick, onMapClick, cent
           const initialMap = new GoogleMap(mapRef.current, {
             center: center || { lat: 22.9447, lng: 90.8411 },
             zoom: 12,
+            mapId: 'DEMO_MAP_ID', // Use a Map ID for better performance if available
+            disableDefaultUI: false,
+            zoomControl: true,
             styles: [
               {
                 "featureType": "all",
@@ -127,26 +131,30 @@ export const Map: React.FC<MapProps> = ({ posts, onMarkerClick, onMapClick, cent
   useEffect(() => {
     if (!map || !infoWindowRef.current || !MarkerClass) return;
 
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.setMap(null));
-    markersRef.current = [];
+    const currentPostIds = new Set(posts.map(p => p.id).filter(Boolean) as string[]);
+    
+    // Remove markers for posts that no longer exist
+    markersMapRef.current.forEach((marker, id) => {
+      if (!currentPostIds.has(id)) {
+        marker.setMap(null);
+        markersMapRef.current.delete(id);
+      }
+    });
 
-      posts.forEach(post => {
-        const isVerified = post.true_votes >= 10;
-        const isReported = post.false_votes >= 5;
-        
-        const marker = new MarkerClass({
+    // Add or update markers
+    posts.forEach(post => {
+      if (!post.id) return;
+      
+      const isVerified = post.true_votes >= 10;
+      const isReported = post.false_votes >= 5;
+      
+      let marker = markersMapRef.current.get(post.id);
+      
+      if (!marker) {
+        marker = new MarkerClass({
           position: { lat: post.latitude, lng: post.longitude },
           map: map,
           title: post.location_name,
-          icon: {
-            path: symbolPathRef.current?.CIRCLE || 0,
-            fillColor: isVerified ? '#10b981' : isReported ? '#ef4444' : '#fbbf24',
-            fillOpacity: 1,
-            strokeWeight: 2,
-            strokeColor: '#ffffff',
-            scale: 10,
-          }
         });
 
         marker.addListener('click', () => {
@@ -185,8 +193,19 @@ export const Map: React.FC<MapProps> = ({ posts, onMarkerClick, onMapClick, cent
           onMarkerClick(post);
         });
 
-        markersRef.current.push(marker);
+        markersMapRef.current.set(post.id, marker);
+      }
+
+      // Update icon properties
+      marker.setIcon({
+        path: symbolPathRef.current?.CIRCLE || 0,
+        fillColor: isVerified ? '#10b981' : isReported ? '#ef4444' : '#fbbf24',
+        fillOpacity: 1,
+        strokeWeight: 2,
+        strokeColor: '#ffffff',
+        scale: 10,
       });
+    });
   }, [posts, map, onMarkerClick, MarkerClass]);
 
   return (
