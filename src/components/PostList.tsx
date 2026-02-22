@@ -12,7 +12,7 @@ interface PostListProps {
 export const PostList: React.FC<PostListProps> = ({ posts, user }) => {
   const handleVote = async (postId: string, type: 'true' | 'false') => {
     if (!user) {
-      toast.error('Please login to vote');
+      toast.error('ভোট দিতে লগইন করুন');
       return;
     }
 
@@ -30,7 +30,7 @@ export const PostList: React.FC<PostListProps> = ({ posts, user }) => {
       }
 
       if (existingVote) {
-        toast.error('You have already voted on this post');
+        toast.error('আপনি ইতিমধ্যে ভোট দিয়েছেন');
         return;
       }
 
@@ -56,16 +56,16 @@ export const PostList: React.FC<PostListProps> = ({ posts, user }) => {
 
       if (updateError) throw updateError;
 
-      toast.success('Vote recorded!');
+      toast.success('ভোট সফল হয়েছে!');
     } catch (error: any) {
-      toast.error('Error voting: ' + error.message);
+      toast.error('ভোট দিতে সমস্যা হয়েছে: ' + error.message);
     }
   };
 
   if (posts.length === 0) {
     return (
       <div className="text-center py-12 bg-white rounded-xl shadow-inner border-2 border-dashed border-gray-200">
-        <p className="text-gray-500 font-medium">No Iftar posts yet. Be the first to share!</p>
+        <p className="text-gray-500 font-medium">এখনও কোনো ইফতার পোস্ট নেই। প্রথম পোস্টটি আপনিই করুন!</p>
       </div>
     );
   }
@@ -74,7 +74,7 @@ export const PostList: React.FC<PostListProps> = ({ posts, user }) => {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-[#064e3b] flex items-center gap-2 px-2">
         <span className="w-2 h-8 bg-[#fbbf24] rounded-full"></span>
-        Recent Iftar Updates
+        সাম্প্রতিক ইফতার আপডেট
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -109,13 +109,13 @@ export const PostList: React.FC<PostListProps> = ({ posts, user }) => {
                     {isVerified && (
                       <span className="flex items-center gap-1 text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold uppercase tracking-wider">
                         <CheckCircle className="w-3 h-3" />
-                        Verified
+                        ভেরিফাইড
                       </span>
                     )}
                     {isReported && (
                       <span className="flex items-center gap-1 text-[10px] bg-red-100 text-red-700 px-2 py-1 rounded-full font-bold uppercase tracking-wider">
                         <AlertTriangle className="w-3 h-3" />
-                        Reported
+                        রিপোর্টেড
                       </span>
                     )}
                   </div>
@@ -128,11 +128,11 @@ export const PostList: React.FC<PostListProps> = ({ posts, user }) => {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Clock className="w-4 h-4 text-[#fbbf24]" />
-                    <span>Iftar at {post.time}</span>
+                    <span>ইফতার: {post.time}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <User className="w-4 h-4 text-[#fbbf24]" />
-                    <span className="truncate">By {post.owner_email.split('@')[0]}</span>
+                    <span className="truncate">শেয়ার করেছেন: {post.owner_email.split('@')[0]}</span>
                   </div>
                 </div>
 

@@ -20,11 +20,11 @@ export const Auth: React.FC<AuthProps> = ({ user }) => {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        toast.success('Logged in successfully!');
+        toast.success('সফলভাবে লগইন হয়েছে!');
       } else {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        toast.success('Account created! Please check your email.');
+        toast.success('অ্যাকাউন্ট তৈরি হয়েছে! দয়া করে আপনার ইমেইল চেক করুন।');
       }
       setEmail('');
       setPassword('');
@@ -37,7 +37,7 @@ export const Auth: React.FC<AuthProps> = ({ user }) => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    toast.success('Logged out');
+    toast.success('লগআউট হয়েছে');
   };
 
   if (user) {
@@ -52,7 +52,7 @@ export const Auth: React.FC<AuthProps> = ({ user }) => {
           className="flex items-center gap-1 text-xs bg-[#fbbf24] text-[#064e3b] px-3 py-1 rounded font-bold hover:bg-[#f59e0b] transition-colors"
         >
           <LogOut className="w-3 h-3" />
-          LOGOUT
+          লগআউট
         </button>
       </div>
     );
@@ -62,12 +62,12 @@ export const Auth: React.FC<AuthProps> = ({ user }) => {
     <div className="bg-white p-6 rounded-xl shadow-xl border-2 border-[#064e3b]/10 max-w-md w-full mx-auto">
       <h2 className="text-2xl font-bold text-[#064e3b] mb-6 flex items-center gap-2">
         {isLogin ? <LogIn className="w-6 h-6" /> : <UserPlus className="w-6 h-6" />}
-        {isLogin ? 'Login to Post' : 'Create Account'}
+        {isLogin ? 'লগইন করুন' : 'অ্যাকাউন্ট তৈরি করুন'}
       </h2>
       
       <form onSubmit={handleAuth} className="space-y-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">ইমেইল ঠিকানা</label>
           <input
             type="email"
             value={email}
@@ -78,7 +78,7 @@ export const Auth: React.FC<AuthProps> = ({ user }) => {
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">পাসওয়ার্ড</label>
           <input
             type="password"
             value={password}
@@ -94,7 +94,7 @@ export const Auth: React.FC<AuthProps> = ({ user }) => {
           disabled={loading}
           className="w-full bg-[#064e3b] text-white py-3 rounded-lg font-bold hover:bg-[#065f46] transition-all shadow-lg active:scale-95 disabled:opacity-50"
         >
-          {loading ? 'PROCESSING...' : (isLogin ? 'SIGN IN' : 'REGISTER')}
+          {loading ? 'কাজ চলছে...' : (isLogin ? 'লগইন' : 'রেজিস্ট্রেশন')}
         </button>
       </form>
       
@@ -102,7 +102,7 @@ export const Auth: React.FC<AuthProps> = ({ user }) => {
         onClick={() => setIsLogin(!isLogin)}
         className="w-full mt-4 text-sm text-[#064e3b] font-medium hover:underline"
       >
-        {isLogin ? "Don't have an account? Register" : "Already have an account? Login"}
+        {isLogin ? "অ্যাকাউন্ট নেই? রেজিস্ট্রেশন করুন" : "অ্যাকাউন্ট আছে? লগইন করুন"}
       </button>
     </div>
   );

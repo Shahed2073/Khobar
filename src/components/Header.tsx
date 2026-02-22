@@ -19,12 +19,12 @@ export const Header: React.FC = () => {
           </h1>
         </div>
         <p className="text-xl md:text-2xl font-medium italic">
-          – কার বাড়িতে খাবা? –
+          – কার বাড়িতে ইফতার করবা? –
         </p>
         <div className="mt-4 flex items-center gap-2 text-sm opacity-80 uppercase tracking-widest">
-          <span>Ramadan 2026</span>
+          <span>রমজান ২০২৬</span>
           <span className="w-1 h-1 bg-[#fbbf24] rounded-full"></span>
-          <span>Live Iftar Map</span>
+          <span>লাইভ ইফতার ম্যাপ</span>
         </div>
       </div>
     </header>

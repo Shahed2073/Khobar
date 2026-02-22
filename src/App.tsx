@@ -73,7 +73,7 @@ export default function App() {
     if (user) {
       setIsFormOpen(true);
     } else {
-      toast.error('Please login to share Iftar');
+      toast.error('ইফতার শেয়ার করতে দয়া করে লগইন করুন');
     }
   };
 
@@ -112,9 +112,9 @@ export default function App() {
               
               {!user && (
                 <div className="bg-[#064e3b] text-white p-6 rounded-xl shadow-lg border-l-4 border-[#fbbf24]">
-                  <h3 className="text-lg font-bold mb-2">Want to share Iftar?</h3>
+                  <h3 className="text-lg font-bold mb-2">ইফতার শেয়ার করতে চান?</h3>
                   <p className="text-sm opacity-90">
-                    Login or create an account to post your Iftar location and help others find a place to break their fast.
+                    লগইন করুন অথবা একটি অ্যাকাউন্ট তৈরি করুন যাতে আপনি আপনার ইফতারের লোকেশন শেয়ার করতে পারেন এবং অন্যদের ইফতার খুঁজে পেতে সাহায্য করতে পারেন।
                   </p>
                 </div>
               )}
@@ -125,7 +125,7 @@ export default function App() {
                   className="w-full bg-[#064e3b] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#065f46] transition-all shadow-lg"
                 >
                   <Plus className="w-6 h-6" />
-                  SHARE NEW IFTAR
+                  নতুন ইফতার শেয়ার করুন
                 </button>
               )}
             </div>
