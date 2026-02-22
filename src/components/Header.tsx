@@ -19,7 +19,7 @@ export const Header: React.FC = () => {
           </h1>
         </div>
         <p className="text-xl md:text-2xl font-medium italic">
-          – কার বাড়িতে ইফতার করবা? –
+          – কার বাড়িত খাবা? –
         </p>
         <div className="mt-4 flex items-center gap-2 text-sm opacity-80 uppercase tracking-widest">
           <span>রমজান ২০২৬</span>
