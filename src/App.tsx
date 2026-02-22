@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import { IftarPost } from './types';
 import { Header } from './components/Header';
-import { Map } from './components/Map';
+import { IftarMap } from './components/Map';
 import { Auth } from './components/Auth';
 import { PostForm } from './components/PostForm';
 import { PostList } from './components/PostList';
@@ -16,11 +16,24 @@ export default function App() {
   const [selectedCoords, setSelectedCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [configError, setConfigError] = useState(false);
 
   useEffect(() => {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      setConfigError(true);
+      setLoading(false);
+      return;
+    }
+
     // Auth listener
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      setLoading(false);
+    }).catch(err => {
+      console.error('Auth error:', err);
       setLoading(false);
     });
 
@@ -32,17 +45,23 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (configError) return;
+
     // Initial fetch
     const fetchPosts = async () => {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        toast.error('Error fetching posts');
-      } else {
-        setPosts(data || []);
+      try {
+        const { data, error } = await supabase
+          .from('posts')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          toast.error('তথ্য আনতে সমস্যা হয়েছে');
+        } else {
+          setPosts(data || []);
+        }
+      } catch (e) {
+        console.error('Fetch error:', e);
       }
     };
 
@@ -54,7 +73,7 @@ export default function App() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, (payload) => {
         if (payload.eventType === 'INSERT') {
           setPosts(prev => [payload.new as IftarPost, ...prev]);
-          toast.success('New Iftar shared!');
+          toast.success('নতুন ইফতার শেয়ার হয়েছে!');
         } else if (payload.eventType === 'UPDATE') {
           setPosts(prev => prev.map(post => post.id === payload.new.id ? payload.new as IftarPost : post));
         } else if (payload.eventType === 'DELETE') {
@@ -66,7 +85,7 @@ export default function App() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [configError]);
 
   const handleMapClick = (lat: number, lng: number) => {
     setSelectedCoords({ lat, lng });
@@ -80,6 +99,33 @@ export default function App() {
   const handleMarkerClick = (post: IftarPost) => {
     console.log('Marker clicked:', post);
   };
+
+  if (configError) {
+    return (
+      <div className="min-h-screen bg-[#f5f5f0] flex flex-col items-center justify-center p-6 text-center">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl border-2 border-red-100 max-w-md">
+          <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">কনফিগারেশন পাওয়া যায়নি!</h1>
+          <p className="text-gray-600 mb-6">
+            দয়া করে আপনার Vercel ড্যাশবোর্ডে <code>VITE_SUPABASE_URL</code> এবং <code>VITE_SUPABASE_ANON_KEY</code> এনভায়রনমেন্ট ভেরিয়েবলগুলো যুক্ত করুন।
+          </p>
+          <div className="text-sm text-left bg-gray-50 p-4 rounded-lg border border-gray-200 font-mono">
+            <p className="font-bold text-gray-700 mb-2">কিভাবে ঠিক করবেন:</p>
+            <ol className="list-decimal list-inside space-y-1 text-gray-500">
+              <li>Vercel Project Settings-এ যান</li>
+              <li>Environment Variables ট্যাবে যান</li>
+              <li>Supabase এর কী-গুলো যুক্ত করুন</li>
+              <li>আবার রি-ডিপ্লয় (Redeploy) করুন</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -95,7 +141,7 @@ export default function App() {
       <Header />
       
       <main>
-        <Map 
+        <IftarMap 
           posts={posts} 
           onMarkerClick={handleMarkerClick} 
           onMapClick={handleMapClick} 

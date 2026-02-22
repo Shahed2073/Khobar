@@ -10,7 +10,7 @@ interface MapProps {
   center?: { lat: number; lng: number };
 }
 
-export const Map: React.FC<MapProps> = ({ posts, onMarkerClick, onMapClick, center }) => {
+export const IftarMap: React.FC<MapProps> = ({ posts, onMarkerClick, onMapClick, center }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [MarkerClass, setMarkerClass] = useState<typeof google.maps.Marker | null>(null);
