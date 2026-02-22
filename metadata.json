@@ -1,0 +1,5 @@
+{
+  "name": "খবর লও – কার বাড়িতে খাবা?",
+  "description": "A live map-based Iftar sharing platform for Ramadan.",
+  "requestFramePermissions": ["geolocation"]
+}
